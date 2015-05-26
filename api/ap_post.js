@@ -1,9 +1,9 @@
 // Module dependencies.
-var express = require('express'),
-    router = express.Router(),
-    mongoose = require('mongoose'),
-    Post = mongoose.models.Post,
-    api = {};
+var express = require('express');
+var router = express.Router();
+var mongoose = require('mongoose');
+var Post = mongoose.models.Post;
+var api = {};
 
 // ALL
 api.posts = function (req, res) {
@@ -110,13 +110,12 @@ api.deletePost = function (req, res) {
 };
 
 
-router.get('/posts', api.posts);
+router.get('/post', api.posts);
 router.post('/post', api.addPost);
 
 router.route('/post/:id')
   .get(api.post)
   .put(api.editPost)
   .delete(api.deletePost);
-
 
 module.exports = router;

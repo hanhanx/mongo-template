@@ -11,18 +11,13 @@ var express = require('express'),
 
 var app = module.exports = exports.app = express();
 
-app.locals.siteName = "Mongo template";
+app.locals.siteName = "Mongo ttt";
 
 // Connect to database
 var db = require('./config/db');
 app.use(express.static(__dirname + '/public'));
 
 
-// Bootstrap models
-var modelsPath = path.join(__dirname, 'models');
-fs.readdirSync(modelsPath).forEach(function (file) {
-  require(modelsPath + '/' + file);
-});
 
 var env = process.env.NODE_ENV || 'development';
 
@@ -62,10 +57,16 @@ app.use(methodOverride());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Bootstrap models
+var modelsPath = path.join(__dirname, 'models');
+fs.readdirSync(modelsPath).forEach(function (file) {
+  require(modelsPath + '/' + file);
+});
+
 // Bootstrap routes
 var routesPath = path.join(__dirname, 'routes');
 fs.readdirSync(routesPath).forEach(function(file) {
-  app.use('/', require(routesPath + '/' + file));
+    app.use('/', require(routesPath + '/' + file));
 });
 
 // Bootstrap api
