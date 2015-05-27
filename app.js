@@ -11,7 +11,7 @@ var express = require('express'),
 
 var app = module.exports = exports.app = express();
 
-app.locals.siteName = "Mongo ttt";
+app.locals.siteName = "Mongo template";
 
 // Connect to database
 var db = require('./config/db');
