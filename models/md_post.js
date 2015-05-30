@@ -9,7 +9,15 @@ var fields = {
 	excerpt: { type: String },
 	content: { type: String },
 	active: { type: Boolean },
-	created: { type: Date , default: Date.now } 
+	created: { type: Date , default: Date.now },
+	user: {
+		type: ObjectId,
+		ref: 'User'
+	},
+	comments: {
+		type: ObjectId,
+		ref: 'Comment'
+	}
 };
 
 var postSchema = new Schema(fields);

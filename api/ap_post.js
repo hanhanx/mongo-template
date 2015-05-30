@@ -5,13 +5,14 @@ var mongoose = require('mongoose');
 var Post = mongoose.models.Post;
 var api = {};
 
+router.apiPath = '/post';
 // ALL
 api.posts = function (req, res) {
   Post.find(function(err, posts) {
     if (err) {
       res.status(500).json(err);
     } else {
-      res.status(200).json({posts: posts});
+      res.status(200).json(posts);
     }
   });
 };
@@ -23,7 +24,7 @@ api.post = function (req, res) {
     if (err) {
       res.status(404).json(err);
     } else {
-      res.status(200).json({post: post});
+      res.status(200).json(post);
     }
   });
 };
@@ -33,11 +34,11 @@ api.addPost = function (req, res) {
 
   var post;
 
-  if(typeof req.body.post == 'undefined'){
+  if(typeof req.body == 'undefined'){
     return res.status(500).json({message: 'post is undefined'});
   }
 
-  post = new Post(req.body.post);
+  post = new Post(req.body);
 
   post.save(function (err) {
     if (!err) {
@@ -110,10 +111,10 @@ api.deletePost = function (req, res) {
 };
 
 
-router.get('/post', api.posts);
-router.post('/post', api.addPost);
+router.get(router.apiPath, api.posts);
+router.post(router.apiPath, api.addPost);
 
-router.route('/post/:id')
+router.route(router.apiPath + '/:id')
   .get(api.post)
   .put(api.editPost)
   .delete(api.deletePost);

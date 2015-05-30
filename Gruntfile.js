@@ -15,7 +15,7 @@ module.exports = function(grunt) {
         livereload: true,
       },
       express: {
-        files:  [ '*.js','routes/*.js', 'models/*.js', 'config/*.js', 'api/*.js' ],
+        files:  [ '*.js','routes/*.js', 'models/*.js', 'config/*.js', 'api/*.js', 'util/*.js' ],
         tasks:  [ 'express:dev' ],
         options: {
           spawn: false // Without this option specified express won't be reloaded
@@ -24,12 +24,11 @@ module.exports = function(grunt) {
     },
     express: {
       options: {
-        port : 3000,
+        port: 3000,
         node_env: 'development'
       },
       dev: {
         options: {
-          cmd: 'node-debug',
           script: 'app.js',
           node_env: 'development'
         }
@@ -38,6 +37,13 @@ module.exports = function(grunt) {
         options: {
           script: 'app.js',
           node_env: 'production'
+        }
+      },
+      debug: {
+        options: {
+          cmd: 'node-debug',
+          script: 'app.js',
+          node_env: 'development'
         }
       }
     },
@@ -50,12 +56,15 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', 'mochaTest');
 
+  grunt.registerTask('debug', [
+      'express:debug',
+      'watch'
+    ]);
   grunt.registerTask('server', function(arg) {
     if(arg && arg == 'prod')
     {
       grunt.task.run([
         'express:prod',
-        'open',
         'watch'
       ]);
     }

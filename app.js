@@ -10,14 +10,14 @@ var express = require('express'),
     errorhandler = require('errorhandler');
 
 var app = module.exports = exports.app = express();
-
 app.locals.siteName = "Mongo template";
+app.locals.restAPI = {uri:[]};
 
 // Connect to database
 var db = require('./config/db');
-app.use(express.static(__dirname + '/public'));
+var util = require('./util/x_util');
 
-
+// app.use(express.static(__dirname + '/public'));
 
 var env = process.env.NODE_ENV || 'development';
 
@@ -60,20 +60,36 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Bootstrap models
 var modelsPath = path.join(__dirname, 'models');
 fs.readdirSync(modelsPath).forEach(function (file) {
+  console.log('bootstrap models: ' + modelsPath + '/' + file);  
   require(modelsPath + '/' + file);
 });
 
 // Bootstrap routes
-var routesPath = path.join(__dirname, 'routes');
-fs.readdirSync(routesPath).forEach(function(file) {
-    app.use('/', require(routesPath + '/' + file));
-});
+// var routesPath = path.join(__dirname, 'routes');
+// fs.readdirSync(routesPath).forEach(function(file) {
+//   console.log('bootstrap routes: ' + routesPath + '/' + file);  
+//   app.use('/', require(routesPath + '/' + file));
+// });
 
 // Bootstrap api
 var apiPath = path.join(__dirname, 'api');
 fs.readdirSync(apiPath).forEach(function(file) {
-  app.use('/api', require(apiPath + '/' + file));
+  console.log('bootstrap api: ' + apiPath + '/' + file);  
+  var apRouter = require(apiPath + '/' + file);
+  app.use('/api', apRouter);
+  app.locals.restAPI.uri.push('/api' + apRouter.apiPath);
+    
 });
+
+
+app.get('/', function(req, res) {
+  res.redirect(301, '/api');
+});
+
+app.get('/api', function(req, res) {
+  res.status(200).json(app.locals.restAPI);
+});
+
 
 // Start server
 var port = process.env.PORT || 3000;
