@@ -7,7 +7,7 @@ var ObjectId = Schema.ObjectId;
 var commentSchema = new Schema({
 	text: String,
 	created: { type: Date , default: Date.now },
-	user: {
+	_userId: {
 		type: ObjectId,
 		ref: 'User'
 	}
