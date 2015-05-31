@@ -18,33 +18,47 @@ var api = {
 	user: function(req, res) {
 		var id = req.params.id;
 		User.findOne({'_id': id}, function(err, user) {
-
+			if(err) {
+				res.status(404).json(err);
+			}
+			else {
+				res.status(200).json(user);
+			}
 		});
 	},
 	addUser: function(req, res) {
 		if(typeof req.body === 'undefined' || req.body.name === undefined) {
 			return res.status(500).json({message: 'user/name is undefined'});
 		}
-
-
+		
+		
 		var user = new User(req.body);
-		user_id = User.count();
-		console.log(user);
-
+		
 		user.save(function(err, data, numberAffected) {
 			if(!err) {
 				return res.status(201).json(data);
 			}	
 			else {
+				console.log(err);
 				return res.status(500).json(err);
 			}
 		});
 	},
 	editUser: function(req, res) {
-
+		res.sendStatus(404);
 	},
 	deleteUser: function(req, res) {
-
+		var id = req.params.id;
+		User.findById(id, function(err, user) {
+			return user.remove(function(err) {
+				if(!err) {
+					return res.status(204).send();
+				}
+				else {
+					return res.status(500).json(err);
+				}
+			});
+		});
 	}
 };
 
