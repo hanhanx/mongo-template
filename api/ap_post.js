@@ -5,9 +5,12 @@ var mongoose = require('mongoose');
 var Post = mongoose.models.Post;
 var api = {};
 
-router.apiPath = '/post';
+router.uri = '/post';
+router.description = 'template post';
+
 // ALL
 api.posts = function (req, res) {
+  console.log("-------------------------------post");
   Post.find(function(err, posts) {
     if (err) {
       res.status(500).json(err);
@@ -111,10 +114,10 @@ api.deletePost = function (req, res) {
 };
 
 
-router.get(router.apiPath, api.posts);
-router.post(router.apiPath, api.addPost);
+router.get(router.uri, api.posts);
+router.post(router.uri, api.addPost);
 
-router.route(router.apiPath + '/:id')
+router.route(router.uri + '/:id')
   .get(api.post)
   .put(api.editPost)
   .delete(api.deletePost);

@@ -11,7 +11,8 @@ var express = require('express'),
 
 var app = module.exports = exports.app = express();
 app.locals.siteName = "Mongo template";
-app.locals.restAPI = {uri:[]};
+app.locals.restAPI = [];
+
 
 // Connect to database
 var db = require('./config/db');
@@ -72,13 +73,17 @@ fs.readdirSync(modelsPath).forEach(function (file) {
 // });
 
 // Bootstrap api
+console.log('test logging'.red);
 var apiPath = path.join(__dirname, 'api');
 fs.readdirSync(apiPath).forEach(function(file) {
-  console.log('bootstrap api: ' + apiPath + '/' + file);  
   var apRouter = require(apiPath + '/' + file);
-  app.use('/api', apRouter);
-  app.locals.restAPI.uri.push('/api' + apRouter.apiPath);
-    
+  if(apRouter && apRouter.stack) {
+    console.log('bootstrap api: ' + apiPath + '/' + file);
+    app.use('/api', apRouter);
+
+    var apiObj = {uri: '/api'+apRouter.uri, description:apRouter.description};
+    app.locals.restAPI.push(apiObj);
+  }
 });
 
 
