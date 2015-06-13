@@ -13,7 +13,6 @@ module.exports = function(MongoModel, uri, extAPI, description) {
 
   var api = {
     list: function(req, res) {
-      console.log("----------------------------base");
       MongoModel.find(function(err, result) {
         if(err) {
           res.status(500).json(err);
@@ -36,28 +35,30 @@ module.exports = function(MongoModel, uri, extAPI, description) {
       });
     },
     validateAdd: function(req, res) {
+      var error;
       if(req.body === undefined || Object.keys(req.body).length === 0) {
-        res.status(500).json({message:'request body is undefined'});
-        return false;
+        error = 'request body is undefined';
       }
-      return true;
-
+      return error;
+      
     },
     add: function(req, res) {
-      if(!api.validateAdd(req, res)) {
-        return res;
+      var error = api.validateAdd(req, res);
+      if(!error) {
+        var model = new MongoModel(req.body);
+        model.save(function(err, data, numberAffected) {
+          if(!err) {
+            res.status(201).json(data);
+          }
+          else {
+            res.status(500).json(err);
+          }
+        });
       }
-
-      var model = new MongoModel(req.body);
-      model.save(function(err, data, numberAffected) {
-        if(!err) {
-          return res.status(201).json(data);
-        }
-        else {
-          console.log(err);
-          return res.status(500).json(err);
-        }
-      });
+      else {
+          res.status(500).json({message:error});
+      }
+      
     },
     edit: function(req, res) {
       res.sendStatus(404);
@@ -67,10 +68,10 @@ module.exports = function(MongoModel, uri, extAPI, description) {
       MongoModel.findById(id, function(err, data) {
         return data.remove(function(err) {
           if(!err) {
-            return res.status(204).send();
+            res.status(204).send();
           }
           else {
-            return res.status(500).json(err);
+            res.status(500).json(err);
           }
         })
       });

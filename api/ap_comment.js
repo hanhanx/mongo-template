@@ -51,7 +51,9 @@ var User = mongoose.models.User;
 //};
 
 var extAPI = {
-
+  add: function(req, res) {
+    
+  }
 };
 
 var commentRouter = baseFactory(Comment, '/comment', extAPI, 'comments from all users');
