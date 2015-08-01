@@ -15,7 +15,7 @@ module.exports = function(grunt) {
         livereload: true,
       },
       express: {
-        files:  [ '*.js','routes/*.js', 'models/*.js', 'config/*.js', 'api/*.js', 'util/*.js' ],
+        files:  [ '*.js','routes/*.js', 'models/*.js', 'config/*.js', 'api/*.js', 'common/*.js' ],
         tasks:  [ 'express:dev' ],
         options: {
           spawn: false // Without this option specified express won't be reloaded

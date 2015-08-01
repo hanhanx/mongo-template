@@ -7,16 +7,15 @@ var express = require('express'),
     methodOverride = require('method-override'),
     morgan = require('morgan'),
     bodyParser = require('body-parser'),
-    errorhandler = require('errorhandler');
+    errorhandler = require('errorhandler'),
+    colors = require('colors');
 
 var app = module.exports = exports.app = express();
 app.locals.siteName = "Mongo template";
 app.locals.restAPI = [];
 
-
 // Connect to database
 var db = require('./config/db');
-var util = require('./util/x_util');
 
 // app.use(express.static(__dirname + '/public'));
 
@@ -61,7 +60,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Bootstrap models
 var modelsPath = path.join(__dirname, 'models');
 fs.readdirSync(modelsPath).forEach(function (file) {
-  console.log('bootstrap models: ' + modelsPath + '/' + file);  
+  console.log(('bootstrap models: ' + modelsPath + '/' + file).yellow);
   require(modelsPath + '/' + file);
 });
 
@@ -73,15 +72,15 @@ fs.readdirSync(modelsPath).forEach(function (file) {
 // });
 
 // Bootstrap api
-console.log('test logging'.red);
+//console.log('test logging'.red);
 var apiPath = path.join(__dirname, 'api');
 fs.readdirSync(apiPath).forEach(function(file) {
-  var apRouter = require(apiPath + '/' + file);
-  if(apRouter && apRouter.stack) {
-    console.log('bootstrap api: ' + apiPath + '/' + file);
-    app.use('/api', apRouter);
+  var api = require(apiPath + '/' + file);
+  if(api.router && api.router.stack) {
+    console.log(('bootstrap api: ' + apiPath + '/' + file).green);
+    app.use('', api.router);
 
-    var apiObj = {uri: '/api'+apRouter.uri, description:apRouter.description};
+    var apiObj = {uri: api.uri, description:api.description};
     app.locals.restAPI.push(apiObj);
   }
 });
