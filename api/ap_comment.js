@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var Comment = mongoose.models.Comment;
 var User = mongoose.models.User;
 var QueryBuilder = require('../common/QueryBuilder.js');
+var apiModelMap = require('../models/api_model_map.js');
 
 var extAPI = {
   add: function(req, res) {
@@ -35,30 +36,19 @@ var extAPI = {
   }
 };
 
-
-
-
 var qb = new QueryBuilder({
     model:Comment,
     population: 'user',
-    afterQuery: function(query) {
-      query.populate('user');
+    afterQuery: function(query, searchSpec) {
+      if(!searchSpec || (searchSpec && searchSpec.extended_fetch)) {
+        query.populate('user');
+      }
     },
     afterExec: function(data) {
-      //var modelMap = {comment: Comment, user:User};
       return data;
     }
   });
 
 
-
-
-var urlModelMap = {
-  '/api/comment': Comment,
-  '/api/user': User
-};
-
-
-
-var commentAPI = baseFactory(qb, '/api/comment', extAPI, 'comments from all users');
+var commentAPI = baseFactory(qb, apiModelMap.Comment, extAPI, 'comments from all users');
 module.exports = commentAPI;

@@ -2,6 +2,7 @@ var baseFactory = require('./base_ap.js');
 var mongoose = require('mongoose');
 var User = mongoose.models.User;
 var QueryBuilder = require('../common/QueryBuilder.js');
+var apiModelMap = require('../models/api_model_map.js');
 
 var extAPI = {
   add: function(req, res) {
@@ -36,5 +37,5 @@ var qb = new QueryBuilder({
   model:User
 });
 
-var userRouter = baseFactory(qb, '/api/user', extAPI, "all user account");
+var userRouter = baseFactory(qb, apiModelMap.User, extAPI, "all user account");
 module.exports = userRouter;

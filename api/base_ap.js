@@ -1,7 +1,6 @@
 var util = require('util');
 var express = require('express');
 var router = express.Router();
-var QueryBuilder = require('../common/QueryBuilder.js');
 
 module.exports = function(qb, uri, extAPI, description) {
 
@@ -75,18 +74,16 @@ module.exports = function(qb, uri, extAPI, description) {
 
   var processResultSet = function(searchSpec, data, fields) {
     var resultSet = [];
-
     for(var i in data) {
       var d = data[i];
-      var o = {URI: searchSpec.baseUri + '/' + d._id};
+      var o = {};
 
 
       if(searchSpec.extended_fetch) {
-        for(var f in fields) {
-          o[fields[f]] = d[fields[f]];
-        }
+        o = d;
       }
       else {
+        o.uri = d.uri;
         o.description = d[searchSpec.link_display_field];
       }
 
@@ -96,20 +93,9 @@ module.exports = function(qb, uri, extAPI, description) {
     return resultSet;
   };
 
-  var decorateFields = function(row) {
-    var newRow = {};
-    for(var key in row) {
-
-    }
-    return newRow;
-  };
-
-
 
   var api = {
     list: function(req, res) {
-
-      //var routeURI = req.baseUrl + req.path;
 
       var fields = qb.getModelFields();
       var options = getOptions(fields[0]);
@@ -120,7 +106,6 @@ module.exports = function(qb, uri, extAPI, description) {
       };
 
       var searchSpec = parseQueryParams(req.query, options);
-      //searchSpec.baseUri = routeURI;
 
       qb.list(searchSpec).exec(function(err, data) { //need to abstract and chainable of this method
 
@@ -133,7 +118,7 @@ module.exports = function(qb, uri, extAPI, description) {
             result.fields = fields;
             result.options = options;
           }
-          result.result_set = data;//processResultSet(searchSpec, data, fields);
+          result.result_set = processResultSet(searchSpec, data, fields);
 
           res.status(200).json(result);
         }
@@ -146,13 +131,7 @@ module.exports = function(qb, uri, extAPI, description) {
           res.status(404).json(err);
         }
         else {
-          //var fields = qb.getModelFields();
-          //var result = {};
-          //for(var f in fields) {
-          //  result[fields[f]] = one[fields[f]];
-          //}
-          var row = stripField(one);
-          res.status(200).json(row);
+          res.status(200).json(one);
         }
       });
     },
