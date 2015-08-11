@@ -83,7 +83,7 @@ var Builder = function(options) {
     for(var key in fields) {
       var value = modelData[key];
       if(key === '__v' || value === undefined) {
-
+        //ignore certain fields
       }
       else if(key === '_id' && value.constructor.name === 'ObjectID' && uri) {
         newData.uri = uri + '/' + value.toString();
