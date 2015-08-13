@@ -3,8 +3,8 @@ var mongoose = require('mongoose');
 var Comment = mongoose.models.Comment;
 var User = mongoose.models.User;
 var QueryBuilder = require('../common/QueryBuilder.js');
-var apiModelMap = require('../models/api_model_map.js');
 
+var apiModelMap = require('./api_model_map.js');
 var extAPI = {
   add: function(req, res) {
  		if(typeof req.body === 'undefined'
@@ -48,7 +48,6 @@ var qb = new QueryBuilder({
       return data;
     }
   });
-
 
 var commentAPI = baseFactory(qb, apiModelMap.Comment, extAPI, 'comments from all users');
 module.exports = commentAPI;

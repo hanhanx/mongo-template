@@ -1,15 +1,20 @@
 'use strict';
-
-// Module dependencies.
+// dependencies
 var express = require('express'),
-    path = require('path'),
-    fs = require('fs'),
-    methodOverride = require('method-override'),
-    morgan = require('morgan'),
-    bodyParser = require('body-parser'),
-    errorhandler = require('errorhandler'),
-    colors = require('colors');
+  path = require('path'),
+  fs = require('fs'),
+  methodOverride = require('method-override'),
+  morgan = require('morgan'),
+  bodyParser = require('body-parser'),
+  errorhandler = require('errorhandler'),
 
+  session = require('express-session'),
+  passport = require('passport'),
+  LocalStrategy = require('passport-local').Strategy;
+
+var logger = require('tracer').console({level:'debug'});
+
+// local variable setup
 var app = module.exports = exports.app = express();
 app.locals.siteName = "Mongo template";
 app.locals.restAPI = [];
@@ -17,10 +22,8 @@ app.locals.restAPI = [];
 // Connect to database
 var db = require('./config/db');
 
-// app.use(express.static(__dirname + '/public'));
-
+// environment setup
 var env = process.env.NODE_ENV || 'development';
-
 if ('development' == env) {
     app.use(morgan('dev'));
     app.use(errorhandler({
@@ -31,7 +34,6 @@ if ('development' == env) {
         pretty: true
     });
 }
-
 if ('test' == env) {
     app.use(morgan('test'));
     app.set('view options', {
@@ -42,7 +44,6 @@ if ('test' == env) {
         showStack: true
     }));
 }
-
 if ('production' == env) {
     app.use(morgan());
      app.use(errorhandler({
@@ -51,34 +52,86 @@ if ('production' == env) {
     }));
 }
 
+
+var user = { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' };
+// passport setup
+function localCallback(username, password, done) {
+  if(username === 'bob') {
+    done(null, user);
+  }
+  else {
+    done(null, false);
+  }
+};
+
+function localSerializer(user, done) {
+  logger.debug(user);
+  done(null, 1234);
+};
+
+function localDeserializer(id, done) {
+  logger.debug(id);
+  done(null, user);
+};
+passport.use(new LocalStrategy(localCallback));
+passport.serializeUser(localSerializer);
+passport.deserializeUser(localDeserializer);
+
+
+// app middleware setup
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
+app.use(session({name: 'AUTH',
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false}));
+
 app.use(methodOverride());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(__dirname + '/public'));
 
 // Bootstrap models
 var modelsPath = path.join(__dirname, 'models');
 fs.readdirSync(modelsPath).forEach(function (file) {
-  console.log(('bootstrap models: ' + modelsPath + '/' + file).yellow);
+  logger.info(modelsPath + '/' + file);
   require(modelsPath + '/' + file);
 });
 
 // Bootstrap routes
-// var routesPath = path.join(__dirname, 'routes');
-// fs.readdirSync(routesPath).forEach(function(file) {
-//   console.log('bootstrap routes: ' + routesPath + '/' + file);  
-//   app.use('/', require(routesPath + '/' + file));
-// });
+//var routesPath = path.join(__dirname, 'routes');
+//fs.readdirSync(routesPath).forEach(function(file) {
+//  logger.info(routesPath + '/' + file);
+  //var router = require(routesPath + '/' + file);
+  //if(router && router.stack) {
+  //  app.use('/', router);
+  //}
+//});
+
+
+function ensureAuthenticated(req, res, next) {
+  console.log(req.isAuthenticated());
+  if(req.isAuthenticated()) {
+    next();
+  }
+  else {
+    res.redirect('/login.html');
+  }
+}
 
 // Bootstrap api
-//console.log('test logging'.red);
+app.all('/api/*', ensureAuthenticated);
+app.get('/api', function(req, res) {
+  res.status(200).json(app.locals.restAPI);
+});
 var apiPath = path.join(__dirname, 'api');
 fs.readdirSync(apiPath).forEach(function(file) {
   var api = require(apiPath + '/' + file);
   if(api.router && api.router.stack) {
-    console.log(('bootstrap api: ' + apiPath + '/' + file).green);
-    app.use('', api.router);
+    logger.info(apiPath + '/' + file);
+    app.use('/', api.router);
 
     var apiObj = {uri: api.uri, description:api.description};
     app.locals.restAPI.push(apiObj);
@@ -86,14 +139,12 @@ fs.readdirSync(apiPath).forEach(function(file) {
 });
 
 
-app.get('/', function(req, res) {
-  res.redirect(301, '/api');
-});
 
-app.get('/api', function(req, res) {
-  res.status(200).json(app.locals.restAPI);
-});
-
+//authentication redirect
+app.post('/auth',
+    passport.authenticate('local',
+      {failureRedirect: '/login.html', successRedirect: '/api'})
+);
 
 // Start server
 var port = process.env.PORT || 3000;

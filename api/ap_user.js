@@ -2,7 +2,7 @@ var baseFactory = require('./base_ap.js');
 var mongoose = require('mongoose');
 var User = mongoose.models.User;
 var QueryBuilder = require('../common/QueryBuilder.js');
-var apiModelMap = require('../models/api_model_map.js');
+var apiModelMap = require('./api_model_map.js');
 
 var extAPI = {
   add: function(req, res) {

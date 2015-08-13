@@ -1,20 +1,20 @@
 var util = require('util');
-var apiModelMap = require('../models/api_model_map.js');
+var apiModelMap = require('../api/api_model_map.js');
 
-var Builder = function(options) {
+function MongooseQueryBuilder (options) {
   if(!options.model) {
     throw new Error('no model is defined in options');
   }
   util._extend(this, options);
 
   //Query create function
-  Builder.prototype.one = function(id) {
+  MongooseQueryBuilder.prototype.one = function(id) {
     this.query = this.model.findById(id);
     this.afterQuery(this.query);
     return this;
   };
 
-  Builder.prototype.list = function(searchSpec) {
+  MongooseQueryBuilder.prototype.list = function(searchSpec) {
     if (searchSpec.extended_fetch) {
       this.query = this.model.find({});
       this.afterQuery(this.query, searchSpec);
@@ -31,7 +31,7 @@ var Builder = function(options) {
   };
 
   //Query exec
-  Builder.prototype.exec = function(callback) {
+  MongooseQueryBuilder.prototype.exec = function(callback) {
     var self = this;
     if(this.query) {
       this.query.exec(function(err, data) {
@@ -56,16 +56,16 @@ var Builder = function(options) {
     }
   };
 
-  Builder.prototype.createNew = function(object) {
+  MongooseQueryBuilder.prototype.createNew = function(object) {
     return new this.model(object);
   };
 
-  Builder.prototype.afterQuery = function(query, multiple) {};
-  Builder.prototype.afterExec = function(data) {
+  MongooseQueryBuilder.prototype.afterQuery = function(query, multiple) {};
+  MongooseQueryBuilder.prototype.afterExec = function(data) {
     return data;
   };
 
-  Builder.prototype.getModelFields = function(model) {
+  MongooseQueryBuilder.prototype.getModelFields = function(model) {
     var dbModel = model || this.model;
     var fields = [];
     for(var key in dbModel.schema.paths) {
@@ -103,5 +103,5 @@ var Builder = function(options) {
 
 
 
-module.exports = Builder;
+module.exports = MongooseQueryBuilder;
 
