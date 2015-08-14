@@ -12,7 +12,7 @@ module.exports = function(grunt) {
     },
     watch: {
       options: {
-        livereload: true,
+        livereload: true
       },
       express: {
         files:  [ '*.js','routes/*.js', 'models/*.js', 'config/*.js', 'api/*.js', 'common/*.js' ],
@@ -56,20 +56,20 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', 'mochaTest');
 
-  grunt.registerTask('debug', [
-      'express:debug',
-      'watch'
-    ]);
-  grunt.registerTask('server', function(arg) {
-    if(arg && arg == 'prod')
-    {
+  grunt.registerTask('serve', function(arg) {
+    if(arg && arg == 'prod') {
       grunt.task.run([
         'express:prod',
         'watch'
       ]);
     }
-    else
-    {
+    if(arg && arg == 'debug') {
+      grunt.task.run([
+        'express:debug',
+        'watch'
+      ]);
+    }
+    else {
       grunt.task.run([
         'express:dev',
         'open',
@@ -77,7 +77,7 @@ module.exports = function(grunt) {
       ]);
     }
   });
-  grunt.registerTask('default', [ 'server' ]);
-  grunt.registerTask('dist', [ 'server:prod' ]);
+  grunt.registerTask('default', [ 'serve' ]);
+  grunt.registerTask('dist', [ 'serve:prod' ]);
 
 };

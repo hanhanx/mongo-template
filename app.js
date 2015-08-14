@@ -14,13 +14,16 @@ var express = require('express'),
 
 var logger = require('tracer').console({level:'debug'});
 
+
+logger.debug(process.env);
+
 // local variable setup
 var app = module.exports = exports.app = express();
 app.locals.siteName = "Mongo template";
 app.locals.restAPI = [];
 
 // Connect to database
-//var db = require('./config/db');
+require('./config/dev.db');
 
 // environment setup
 var env = process.env.NODE_ENV || 'development';
@@ -33,6 +36,7 @@ if ('development' == env) {
     app.set('view options', {
         pretty: true
     });
+  require('./config/dev.db');
 }
 if ('test' == env) {
     app.use(morgan('test'));
@@ -109,7 +113,6 @@ fs.readdirSync(modelsPath).forEach(function (file) {
   //  app.use('/', router);
   //}
 //});
-
 
 function ensureAuthenticated(req, res, next) {
   console.log(req.isAuthenticated());
