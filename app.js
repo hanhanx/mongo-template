@@ -123,7 +123,7 @@ function ensureAuthenticated(req, res, next) {
 
 // Bootstrap api
 app.all('/api/*', ensureAuthenticated);
-app.get('/api', function(req, res) {
+app.get('/api', ensureAuthenticated, function(req, res) {
   res.status(200).json(app.locals.restAPI);
 });
 var apiPath = path.join(__dirname, 'api');
