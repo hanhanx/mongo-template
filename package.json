@@ -18,7 +18,6 @@
     "tracer": "^0.7.4"
   },
   "devDependencies": {
-    "bower": "latest",
     "grunt": "latest",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-express-server": "^0.4.17",
@@ -29,8 +28,6 @@
     "supertest": "latest"
   },
   "scripts": {
-    "postinstall": "grunt test",
-    "test": "grunt test",
     "start": "app.js"
   }
 }
