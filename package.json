@@ -26,6 +26,5 @@
     "load-grunt-tasks": "^0.4.0",
     "mocha": "latest",
     "supertest": "latest"
-    
   }
 }
