@@ -23,7 +23,6 @@ app.locals.siteName = "Mongo template";
 app.locals.restAPI = [];
 
 // Connect to database
-require('./config/dev.db');
 
 // environment setup
 var env = process.env.NODE_ENV || 'development';
