@@ -2,7 +2,7 @@
 var mongoose = require('mongoose');
 
 var config = {
-  "db": "myDb",
+  "db": "master",
   "host": "localhost",
   "user": "",
   "pw": "",

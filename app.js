@@ -28,6 +28,7 @@ require('./config/dev.db');
 // environment setup
 var env = process.env.NODE_ENV || 'development';
 if ('development' == env) {
+    require('./config/dev.db');
     app.use(morgan('dev'));
     app.use(errorhandler({
         dumpExceptions: true,
@@ -36,7 +37,6 @@ if ('development' == env) {
     app.set('view options', {
         pretty: true
     });
-  require('./config/dev.db');
 }
 if ('test' == env) {
     app.use(morgan('test'));
