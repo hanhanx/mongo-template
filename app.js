@@ -12,10 +12,9 @@ var express = require('express'),
   passport = require('passport'),
   LocalStrategy = require('passport-local').Strategy;
 
-var logger = require('tracer').console({level:'debug'});
+var logger = require('./common/Logger');
 
 
-logger.debug(process.env);
 
 // local variable setup
 var app = module.exports = exports.app = express();
@@ -27,7 +26,7 @@ app.locals.restAPI = [];
 // environment setup
 var env = process.env.NODE_ENV || 'development';
 if ('development' == env) {
-    require('./config/dev.db');
+    //require('./config/dev.db');
     app.use(morgan('dev'));
     app.use(errorhandler({
         dumpExceptions: true,
